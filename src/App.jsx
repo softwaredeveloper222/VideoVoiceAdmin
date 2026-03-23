@@ -1,5 +1,51 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase, VIDEOS_BUCKET } from "./supabase";
+
+function VideoThumbnail({ src, onClick }) {
+  const canvasRef = useRef(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (!src) return;
+    const video = document.createElement("video");
+    video.crossOrigin = "anonymous";
+    video.muted = true;
+    video.preload = "metadata";
+    video.src = src;
+
+    const handleSeeked = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext("2d").drawImage(video, 0, 0);
+      setReady(true);
+      video.removeEventListener("seeked", handleSeeked);
+      video.src = "";
+    };
+
+    video.addEventListener("loadeddata", () => {
+      video.currentTime = 0.1;
+    });
+    video.addEventListener("seeked", handleSeeked);
+
+    return () => {
+      video.removeEventListener("seeked", handleSeeked);
+      video.src = "";
+    };
+  }, [src]);
+
+  return (
+    <div style={d.videoPlaceholder} onClick={onClick}>
+      <canvas ref={canvasRef} style={{ width: "100%", height: "100%", objectFit: "cover", display: ready ? "block" : "none" }} />
+      <div style={{ ...d.playBtn, position: "absolute" }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" stroke="none">
+          <polygon points="6 3 20 12 6 21 6 3" />
+        </svg>
+      </div>
+    </div>
+  );
+}
 
 const CREDENTIALS = { username: "admin", password: "admin123" };
 
@@ -95,77 +141,79 @@ const login = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "radial-gradient(ellipse at 50% 0%, #141830 0%, #090b11 70%)",
+    backgroundImage: "url(/img/Blue-AR-space@2x.png)",
+    backgroundSize: "100% 100%",
+    backgroundPosition: "center",
     position: "relative",
     overflow: "hidden",
   },
   glow: {
     position: "absolute",
-    top: "-40%",
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: 600,
-    height: 600,
-    borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)",
+    inset: 0,
+    background: "rgba(0,0,0,0.25)",
     pointerEvents: "none",
   },
   card: {
     position: "relative",
     width: 380,
     padding: "40px 32px 36px",
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.18)",
     borderRadius: 16,
-    backdropFilter: "blur(20px)",
+    backdropFilter: "blur(24px)",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
   },
   logoWrap: { textAlign: "center", marginBottom: 28 },
   logo: {
     width: 52,
     height: 52,
     borderRadius: 14,
-    background: "rgba(99,102,241,0.12)",
+    background: "rgba(255,255,255,0.15)",
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 14,
   },
   title: { fontSize: 22, fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.02em" },
-  subtitle: { fontSize: 13, color: "#6b7280", marginTop: 4 },
+  subtitle: { fontSize: 13, color: "rgba(255,255,255,0.75)", marginTop: 4 },
   error: {
-    background: "rgba(239,68,68,0.1)",
-    border: "1px solid rgba(239,68,68,0.2)",
-    color: "#fca5a5",
+    background: "rgba(239,68,68,0.2)",
+    border: "1px solid rgba(239,68,68,0.4)",
+    color: "#fecaca",
     padding: "10px 14px",
     borderRadius: 10,
     fontSize: 13,
+    fontWeight: 500,
     marginBottom: 16,
     textAlign: "center",
   },
   field: { marginBottom: 18 },
-  label: { display: "block", fontSize: 13, fontWeight: 500, color: "#9ca3af", marginBottom: 6 },
+  label: { display: "block", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.85)", marginBottom: 6 },
   input: {
     width: "100%",
     padding: "11px 14px",
     borderRadius: 10,
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,255,255,0.25)",
+    background: "rgba(255,255,255,0.12)",
     color: "#fff",
     fontSize: 14,
+    fontWeight: 500,
     outline: "none",
     transition: "border-color 0.2s",
   },
   btn: {
     width: "100%",
-    padding: "12px 0",
+    padding: "13px 0",
     borderRadius: 10,
     border: "none",
-    background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+    background: "linear-gradient(135deg, #818cf8, #6366f1)",
     color: "#fff",
-    fontSize: 14,
-    fontWeight: 600,
+    fontSize: 15,
+    fontWeight: 700,
     cursor: "pointer",
     marginTop: 6,
+    letterSpacing: "0.02em",
+    boxShadow: "0 4px 16px rgba(99,102,241,0.4)",
     transition: "opacity 0.2s",
   },
 };
@@ -344,15 +392,15 @@ function AdminDashboard({ onLogout }) {
         {loading ? (
           <div style={d.center}>
             <div style={d.spinner} />
-            <p style={{ marginTop: 16, color: "#6b7280" }}>Loading testimonials...</p>
+            <p style={{ marginTop: 16, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>Loading testimonials...</p>
           </div>
         ) : filtered.length === 0 ? (
           <div style={d.empty}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="23 7 16 12 23 17 23 7" />
               <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
             </svg>
-            <p style={{ marginTop: 16, fontSize: 15, color: "#6b7280" }}>
+            <p style={{ marginTop: 16, fontSize: 15, color: "rgba(255,255,255,0.65)", fontWeight: 500 }}>
               {search ? "No testimonials match your search" : "No testimonials yet"}
             </p>
           </div>
@@ -364,13 +412,7 @@ function AdminDashboard({ onLogout }) {
                   {playingId === item.id ? (
                     <video src={item.video_url} controls autoPlay style={d.video} onEnded={() => setPlayingId(null)} />
                   ) : (
-                    <div style={d.videoPlaceholder} onClick={() => setPlayingId(item.id)}>
-                      <div style={d.playBtn}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" stroke="none">
-                          <polygon points="6 3 20 12 6 21 6 3" />
-                        </svg>
-                      </div>
-                    </div>
+                    <VideoThumbnail src={item.video_url} onClick={() => setPlayingId(item.id)} />
                   )}
                 </div>
 
@@ -427,12 +469,15 @@ const d = {
   app: {
     display: "flex",
     minHeight: "100vh",
-    background: "#090b11",
+    backgroundImage: "url(/img/Blue-AR-space@2x.png)",
+    backgroundSize: "100% 100%",
+    backgroundAttachment: "fixed",
   },
   sidebar: {
     width: 220,
-    background: "rgba(255,255,255,0.02)",
-    borderRight: "1px solid rgba(255,255,255,0.06)",
+    background: "rgba(0,0,0,0.3)",
+    borderRight: "1px solid rgba(255,255,255,0.08)",
+    backdropFilter: "blur(20px)",
     padding: "20px 14px",
     display: "flex",
     flexDirection: "column",
@@ -448,7 +493,7 @@ const d = {
     gap: 10,
     padding: "4px 8px 24px",
   },
-  sidebarBrand: { fontSize: 16, fontWeight: 700, color: "#fff", letterSpacing: "-0.02em" },
+  sidebarBrand: { fontSize: 16, fontWeight: 700, color: "#fff", letterSpacing: "-0.02em", textShadow: "0 1px 4px rgba(0,0,0,0.3)" },
   nav: {},
   navItem: {
     display: "flex",
@@ -456,10 +501,10 @@ const d = {
     gap: 10,
     padding: "10px 12px",
     borderRadius: 10,
-    background: "rgba(99,102,241,0.1)",
-    color: "#a5b4fc",
+    background: "rgba(255,255,255,0.15)",
+    color: "#c7d2fe",
     fontSize: 14,
-    fontWeight: 500,
+    fontWeight: 600,
     cursor: "pointer",
   },
   logoutBtn: {
@@ -468,10 +513,11 @@ const d = {
     gap: 10,
     padding: "10px 12px",
     borderRadius: 10,
-    border: "1px solid rgba(255,255,255,0.06)",
-    background: "transparent",
-    color: "#6b7280",
+    border: "1px solid rgba(255,255,255,0.15)",
+    background: "rgba(255,255,255,0.06)",
+    color: "rgba(255,255,255,0.7)",
     fontSize: 13,
+    fontWeight: 500,
     cursor: "pointer",
     transition: "all 0.2s",
     width: "100%",
@@ -490,21 +536,22 @@ const d = {
     flexWrap: "wrap",
     gap: 16,
   },
-  title: { fontSize: 24, fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.02em" },
-  subtitle: { fontSize: 14, color: "#6b7280", marginTop: 4 },
+  title: { fontSize: 24, fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.02em", textShadow: "0 1px 4px rgba(0,0,0,0.3)" },
+  subtitle: { fontSize: 14, color: "rgba(255,255,255,0.7)", marginTop: 4 },
   statsRow: { display: "flex", gap: 20 },
   stat: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     padding: "12px 20px",
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.06)",
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.15)",
     borderRadius: 12,
     minWidth: 80,
+    backdropFilter: "blur(8px)",
   },
-  statNum: { fontSize: 22, fontWeight: 700, color: "#a5b4fc" },
-  statLabel: { fontSize: 11, color: "#6b7280", marginTop: 2, textTransform: "uppercase", letterSpacing: "0.05em" },
+  statNum: { fontSize: 22, fontWeight: 700, color: "#c7d2fe", textShadow: "0 1px 8px rgba(99,102,241,0.4)" },
+  statLabel: { fontSize: 11, color: "rgba(255,255,255,0.6)", fontWeight: 600, marginTop: 2, textTransform: "uppercase", letterSpacing: "0.05em" },
   toolbar: {
     display: "flex",
     alignItems: "center",
@@ -517,42 +564,48 @@ const d = {
     width: "100%",
     padding: "11px 14px 11px 40px",
     borderRadius: 10,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "rgba(255,255,255,0.03)",
+    border: "1px solid rgba(255,255,255,0.2)",
+    background: "rgba(255,255,255,0.1)",
     color: "#fff",
     fontSize: 14,
+    fontWeight: 500,
     outline: "none",
+    backdropFilter: "blur(8px)",
     transition: "border-color 0.2s",
   },
   sortGroup: { display: "flex", alignItems: "center", gap: 8 },
   select: {
     padding: "10px 14px",
     borderRadius: 10,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "rgba(255,255,255,0.03)",
-    color: "#c9cdd6",
+    border: "1px solid rgba(255,255,255,0.2)",
+    background: "rgba(255,255,255,0.1)",
+    color: "rgba(255,255,255,0.9)",
     fontSize: 13,
+    fontWeight: 500,
     cursor: "pointer",
     outline: "none",
+    backdropFilter: "blur(8px)",
     transition: "border-color 0.2s",
   },
   iconBtn: {
     width: 38,
     height: 38,
     borderRadius: 10,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "rgba(255,255,255,0.03)",
-    color: "#c9cdd6",
+    border: "1px solid rgba(255,255,255,0.2)",
+    background: "rgba(255,255,255,0.1)",
+    color: "#fff",
     fontSize: 16,
+    fontWeight: 600,
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    backdropFilter: "blur(8px)",
     transition: "all 0.2s",
   },
   error: {
-    background: "rgba(239,68,68,0.08)",
-    border: "1px solid rgba(239,68,68,0.2)",
+    background: "rgba(239,68,68,0.15)",
+    border: "1px solid rgba(239,68,68,0.3)",
     color: "#fca5a5",
     padding: "12px 16px",
     borderRadius: 10,
@@ -587,15 +640,17 @@ const d = {
     gap: 20,
   },
   card: {
-    background: "rgba(255,255,255,0.03)",
+    background: "rgba(255,255,255,0.1)",
     borderRadius: 14,
     overflow: "hidden",
-    border: "1px solid rgba(255,255,255,0.06)",
+    border: "1px solid rgba(255,255,255,0.15)",
     transition: "border-color 0.2s, transform 0.2s",
+    backdropFilter: "blur(16px)",
+    boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
   },
   videoWrap: {
     aspectRatio: "16/9",
-    background: "#000",
+    background: "rgba(0,0,0,0.2)",
     position: "relative",
     overflow: "hidden",
   },
@@ -607,15 +662,17 @@ const d = {
     alignItems: "center",
     justifyContent: "center",
     cursor: "pointer",
-    background: "linear-gradient(135deg, #0c1221 0%, #131a3a 100%)",
-    transition: "background 0.3s",
+    backgroundImage: "url(/img/LWYW_card_2.png)",
+    backgroundSize: "100% 100%",
+    backgroundPosition: "center",
+    transition: "opacity 0.3s",
   },
   playBtn: {
     width: 56,
     height: 56,
     borderRadius: "50%",
-    background: "rgba(99,102,241,0.25)",
-    border: "2px solid rgba(99,102,241,0.4)",
+    background: "rgba(255,255,255,0.2)",
+    border: "2px solid rgba(255,255,255,0.35)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -637,16 +694,17 @@ const d = {
     color: "#fff",
     flexShrink: 0,
   },
-  email: { fontSize: 14, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
-  meta: { fontSize: 12, color: "#6b7280", marginTop: 2 },
+  email: { fontSize: 14, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textShadow: "0 1px 2px rgba(0,0,0,0.2)" },
+  meta: { fontSize: 12, color: "rgba(255,255,255,0.6)", fontWeight: 500, marginTop: 2 },
   filename: {
     fontSize: 12,
-    color: "#4b5563",
+    color: "rgba(255,255,255,0.5)",
+    fontWeight: 500,
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
     padding: "6px 0 2px",
-    borderTop: "1px solid rgba(255,255,255,0.04)",
+    borderTop: "1px solid rgba(255,255,255,0.08)",
   },
   cardActions: { display: "flex", gap: 8, padding: "8px 18px 16px" },
   downloadBtn: {
@@ -657,14 +715,15 @@ const d = {
     gap: 6,
     padding: "9px 0",
     borderRadius: 8,
-    background: "rgba(99,102,241,0.1)",
-    color: "#a5b4fc",
+    background: "rgba(99,102,241,0.25)",
+    color: "#e0e7ff",
     fontSize: 13,
-    fontWeight: 500,
+    fontWeight: 600,
     textDecoration: "none",
     cursor: "pointer",
     transition: "all 0.2s",
-    border: "1px solid rgba(99,102,241,0.15)",
+    border: "1px solid rgba(99,102,241,0.3)",
+    boxShadow: "0 2px 8px rgba(99,102,241,0.2)",
   },
   deleteBtn: {
     flex: 1,
@@ -674,11 +733,11 @@ const d = {
     gap: 6,
     padding: "9px 0",
     borderRadius: 8,
-    background: "rgba(239,68,68,0.08)",
-    color: "#f87171",
+    background: "rgba(239,68,68,0.2)",
+    color: "#fecaca",
     fontSize: 13,
-    fontWeight: 500,
-    border: "1px solid rgba(239,68,68,0.12)",
+    fontWeight: 600,
+    border: "1px solid rgba(239,68,68,0.25)",
     cursor: "pointer",
     transition: "all 0.2s",
   },
