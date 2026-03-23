@@ -227,6 +227,16 @@ function AdminDashboard({ onLogout }) {
   const [sortBy, setSortBy] = useState("created_at");
   const [sortDir, setSortDir] = useState("desc");
   const [search, setSearch] = useState("");
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortRef = useRef(null);
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (sortRef.current && !sortRef.current.contains(e.target)) setSortOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   const fetchTestimonials = useCallback(async () => {
     setLoading(true);
@@ -371,10 +381,31 @@ function AdminDashboard({ onLogout }) {
             />
           </div>
           <div style={d.sortGroup}>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={d.select}>
-              <option value="created_at">Sort by Date</option>
-              <option value="email">Sort by Email</option>
-            </select>
+            <div ref={sortRef} style={{ position: "relative" }}>
+              <button onClick={() => setSortOpen((o) => !o)} style={d.select}>
+                {sortBy === "created_at" ? "Sort by Date" : "Sort by Email"}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 8, transition: "transform 0.3s", transform: sortOpen ? "rotate(180deg)" : "rotate(0deg)" }}>
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              {sortOpen && (
+                <div style={d.dropdown}>
+                  {[{ value: "created_at", label: "Sort by Date" }, { value: "email", label: "Sort by Email" }].map((opt, i) => (
+                    <div
+                      key={opt.value}
+                      onClick={() => { setSortBy(opt.value); setSortOpen(false); }}
+                      style={{
+                        ...d.dropdownItem,
+                        background: sortBy === opt.value ? "rgba(99,102,241,0.25)" : "transparent",
+                        animationDelay: `${i * 0.05}s`,
+                      }}
+                    >
+                      {opt.label}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <button onClick={() => setSortDir((dir) => (dir === "asc" ? "desc" : "asc"))} style={d.iconBtn} title={sortDir === "asc" ? "Ascending" : "Descending"}>
               {sortDir === "asc" ? "\u2191" : "\u2193"}
             </button>
@@ -459,7 +490,16 @@ function AdminDashboard({ onLogout }) {
           to { opacity: 1; transform: translateY(0); }
         }
         button:hover, a:hover { filter: brightness(1.15); }
-        input:focus, select:focus { border-color: rgba(99,102,241,0.5) !important; }
+        input:focus { border-color: rgba(99,102,241,0.5) !important; }
+        input::placeholder { color: rgba(255,255,255,0.4); }
+        @keyframes dropIn {
+          from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes dropItemIn {
+          from { opacity: 0; transform: translateX(-6px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
       `}</style>
     </div>
   );
@@ -575,17 +615,45 @@ const d = {
   },
   sortGroup: { display: "flex", alignItems: "center", gap: 8 },
   select: {
+    display: "inline-flex",
+    alignItems: "center",
     padding: "10px 14px",
     borderRadius: 10,
     border: "1px solid rgba(255,255,255,0.2)",
     background: "rgba(255,255,255,0.1)",
-    color: "rgba(255,255,255,0.9)",
+    color: "#fff",
     fontSize: 13,
-    fontWeight: 500,
+    fontWeight: 600,
     cursor: "pointer",
     outline: "none",
     backdropFilter: "blur(8px)",
-    transition: "border-color 0.2s",
+    transition: "border-color 0.2s, background 0.2s",
+    textShadow: "0 1px 3px rgba(0,0,0,0.3)",
+  },
+  dropdown: {
+    position: "absolute",
+    top: "calc(100% + 6px)",
+    left: 0,
+    minWidth: "100%",
+    background: "rgba(15,10,40,0.92)",
+    border: "1px solid rgba(255,255,255,0.15)",
+    borderRadius: 10,
+    padding: "6px",
+    backdropFilter: "blur(20px)",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+    zIndex: 50,
+    animation: "dropIn 0.25s ease",
+  },
+  dropdownItem: {
+    padding: "9px 14px",
+    borderRadius: 8,
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: 500,
+    cursor: "pointer",
+    whiteSpace: "nowrap",
+    transition: "background 0.15s",
+    animation: "dropItemIn 0.25s ease both",
   },
   iconBtn: {
     width: 38,
