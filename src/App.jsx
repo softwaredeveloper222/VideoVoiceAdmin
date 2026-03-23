@@ -71,6 +71,7 @@ function LoginPage({ onLogin }) {
     <div style={login.wrapper}>
       <div style={login.glow} />
       <form
+        className="vv-login-card"
         onSubmit={handleSubmit}
         style={{
           ...login.card,
@@ -228,6 +229,8 @@ function AdminDashboard({ onLogout }) {
   const [sortDir, setSortDir] = useState("desc");
   const [search, setSearch] = useState("");
   const [sortOpen, setSortOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const perPage = 6;
   const sortRef = useRef(null);
 
   useEffect(() => {
@@ -308,6 +311,13 @@ function AdminDashboard({ onLogout }) {
       t.filename?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const safePage = Math.min(page, totalPages);
+  const paged = filtered.slice((safePage - 1) * perPage, safePage * perPage);
+
+  // Reset page when search changes
+  useEffect(() => { setPage(1); }, [search]);
+
   const formatDate = (d) => {
     if (!d) return "\u2014";
     return new Date(d).toLocaleString("en-US", {
@@ -319,7 +329,7 @@ function AdminDashboard({ onLogout }) {
   return (
     <div style={d.app}>
       {/* Sidebar */}
-      <aside style={d.sidebar}>
+      <aside className="vv-sidebar" style={d.sidebar}>
         <div style={d.sidebarTop}>
           <div style={d.sidebarLogo}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -348,8 +358,27 @@ function AdminDashboard({ onLogout }) {
         </button>
       </aside>
 
+      {/* Mobile top bar */}
+      <div className="vv-mobile-bar" style={d.mobileBar}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="23 7 16 12 23 17 23 7" />
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+          </svg>
+          <span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>VideoVoice</span>
+        </div>
+        <button onClick={onLogout} style={d.mobileLogout}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Logout
+        </button>
+      </div>
+
       {/* Main content */}
-      <main style={d.main}>
+      <main className="vv-main" style={d.main}>
         <header style={d.header}>
           <div>
             <h1 style={d.title}>Testimonials</h1>
@@ -436,50 +465,99 @@ function AdminDashboard({ onLogout }) {
             </p>
           </div>
         ) : (
-          <div style={d.grid}>
-            {filtered.map((item) => (
-              <div key={item.id} style={d.card}>
-                <div style={d.videoWrap}>
-                  {playingId === item.id ? (
-                    <video src={item.video_url} controls autoPlay style={d.video} onEnded={() => setPlayingId(null)} />
-                  ) : (
-                    <VideoThumbnail src={item.video_url} onClick={() => setPlayingId(item.id)} />
-                  )}
-                </div>
+          <>
+          <div key={safePage} className="vv-grid" style={d.grid}>
+            {paged.map((item, i) => (
+              <div key={item.id} style={{ ...d.phone, animation: `cardIn 0.4s ease ${i * 0.06}s both` }}>
+                {/* Phone frame */}
+                <div style={d.phoneFrame}>
+                  {/* Notch */}
+                  <div style={d.phoneNotch}>
+                    <div style={d.phoneCamera} />
+                  </div>
 
-                <div style={d.cardBody}>
-                  <div style={d.cardRow}>
-                    <div style={d.avatar}>{(item.email?.[0] || "?").toUpperCase()}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={d.email}>{item.email}</div>
-                      <div style={d.meta}>{formatDate(item.created_at)}</div>
+                  {/* Screen */}
+                  <div style={d.phoneScreen}>
+                    {playingId === item.id ? (
+                      <video src={item.video_url} controls autoPlay style={d.video} onEnded={() => setPlayingId(null)} />
+                    ) : (
+                      <VideoThumbnail src={item.video_url} onClick={() => setPlayingId(item.id)} />
+                    )}
+
+                    {/* Overlay info at bottom */}
+                    <div style={d.phoneOverlay}>
+                      <div style={d.phoneUser}>
+                        <div style={d.avatar}>{(item.email?.[0] || "?").toUpperCase()}</div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={d.email}>{item.email}</div>
+                          <div style={d.meta}>{formatDate(item.created_at)}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Side action buttons */}
+                    <div style={d.phoneSideActions}>
+                      <button onClick={() => handleDownload(item)} style={d.sideBtn} title="Download">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item)}
+                        disabled={deleting === item.id}
+                        style={{ ...d.sideBtn, opacity: deleting === item.id ? 0.5 : 1 }}
+                        title="Delete"
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                      </button>
                     </div>
                   </div>
-                  <div style={d.filename} title={item.filename}>{item.filename}</div>
-                </div>
 
-                <div style={d.cardActions}>
-                  <button onClick={() => handleDownload(item)} style={d.downloadBtn}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                    Download
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item)}
-                    disabled={deleting === item.id}
-                    style={{ ...d.deleteBtn, opacity: deleting === item.id ? 0.5 : 1 }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                    </svg>
-                    {deleting === item.id ? "Deleting..." : "Delete"}
-                  </button>
+                  {/* Home indicator */}
+                  <div style={d.phoneHomeBar}>
+                    <div style={d.phoneHomePill} />
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {totalPages > 1 && (
+            <div style={d.pagination}>
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+                style={{ ...d.pageBtn, opacity: safePage <= 1 ? 0.35 : 1 }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  style={{
+                    ...d.pageBtn,
+                    background: p === safePage ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.08)",
+                    borderColor: p === safePage ? "rgba(99,102,241,0.5)" : "rgba(255,255,255,0.12)",
+                    color: p === safePage ? "#e0e7ff" : "rgba(255,255,255,0.7)",
+                  }}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage >= totalPages}
+                style={{ ...d.pageBtn, opacity: safePage >= totalPages ? 0.35 : 1 }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+              </button>
+            </div>
+          )}
+          </>
         )}
       </main>
 
@@ -500,6 +578,21 @@ function AdminDashboard({ onLogout }) {
           from { opacity: 0; transform: translateX(-6px); }
           to { opacity: 1; transform: translateX(0); }
         }
+        @keyframes cardIn {
+          from { opacity: 0; transform: translateY(20px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .vv-grid { grid-template-columns: repeat(6, 1fr); }
+        .vv-mobile-bar { display: none !important; }
+        @media (max-width: 1400px) { .vv-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 1000px) { .vv-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) {
+          .vv-grid { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; }
+          .vv-sidebar { display: none !important; }
+          .vv-mobile-bar { display: flex !important; }
+          .vv-main { padding: 16px !important; }
+          .vv-login-card { width: 100% !important; max-width: 340px; padding: 28px 20px 24px !important; }
+        }
       `}</style>
     </div>
   );
@@ -508,6 +601,7 @@ function AdminDashboard({ onLogout }) {
 const d = {
   app: {
     display: "flex",
+    flexWrap: "wrap",
     minHeight: "100vh",
     backgroundImage: "url(/img/Blue-AR-space@2x.png)",
     backgroundSize: "100% 100%",
@@ -561,6 +655,32 @@ const d = {
     cursor: "pointer",
     transition: "all 0.2s",
     width: "100%",
+  },
+  mobileBar: {
+    display: "none",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "12px 16px",
+    background: "rgba(0,0,0,0.3)",
+    backdropFilter: "blur(20px)",
+    borderBottom: "1px solid rgba(255,255,255,0.08)",
+    position: "sticky",
+    top: 0,
+    zIndex: 40,
+    width: "100%",
+  },
+  mobileLogout: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    padding: "7px 12px",
+    borderRadius: 8,
+    border: "1px solid rgba(255,255,255,0.15)",
+    background: "rgba(255,255,255,0.06)",
+    color: "rgba(255,255,255,0.7)",
+    fontSize: 12,
+    fontWeight: 500,
+    cursor: "pointer",
   },
   main: {
     flex: 1,
@@ -704,25 +824,43 @@ const d = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
     gap: 20,
   },
-  card: {
+  phone: {
+    display: "flex",
+    justifyContent: "center",
+  },
+  phoneFrame: {
+    width: "100%",
+    background: "#1a1a2e",
+    borderRadius: 28,
+    padding: "8px 6px",
+    border: "2px solid rgba(255,255,255,0.12)",
+    boxShadow: "0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+  },
+  phoneNotch: {
+    display: "flex",
+    justifyContent: "center",
+    padding: "4px 0 6px",
+  },
+  phoneCamera: {
+    width: 40,
+    height: 5,
+    borderRadius: 10,
     background: "rgba(255,255,255,0.1)",
-    borderRadius: 14,
-    overflow: "hidden",
-    border: "1px solid rgba(255,255,255,0.15)",
-    transition: "border-color 0.2s, transform 0.2s",
-    backdropFilter: "blur(16px)",
-    boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
   },
-  videoWrap: {
-    aspectRatio: "16/9",
-    background: "rgba(0,0,0,0.2)",
+  phoneScreen: {
+    flex: 1,
+    borderRadius: 20,
+    overflow: "hidden",
     position: "relative",
-    overflow: "hidden",
+    aspectRatio: "9/16",
+    background: "#000",
   },
-  video: { width: "100%", height: "100%", objectFit: "contain" },
+  video: { width: "100%", height: "100%", objectFit: "cover" },
   videoPlaceholder: {
     width: "100%",
     height: "100%",
@@ -736,77 +874,104 @@ const d = {
     transition: "opacity 0.3s",
   },
   playBtn: {
-    width: 56,
-    height: 56,
+    width: 48,
+    height: 48,
     borderRadius: "50%",
     background: "rgba(255,255,255,0.2)",
-    border: "2px solid rgba(255,255,255,0.35)",
+    border: "2px solid rgba(255,255,255,0.4)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     transition: "all 0.2s",
     paddingLeft: 3,
+    backdropFilter: "blur(6px)",
   },
-  cardBody: { padding: "16px 18px 10px" },
-  cardRow: { display: "flex", alignItems: "center", gap: 12, marginBottom: 8 },
+  phoneOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: "32px 12px 14px",
+    background: "linear-gradient(transparent, rgba(0,0,0,0.7))",
+    pointerEvents: "none",
+  },
+  phoneUser: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  },
   avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+    width: 30,
+    height: 30,
+    borderRadius: "50%",
+    background: "linear-gradient(135deg, #818cf8, #6366f1)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 700,
     color: "#fff",
     flexShrink: 0,
+    border: "2px solid rgba(255,255,255,0.3)",
   },
-  email: { fontSize: 14, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textShadow: "0 1px 2px rgba(0,0,0,0.2)" },
-  meta: { fontSize: 12, color: "rgba(255,255,255,0.6)", fontWeight: 500, marginTop: 2 },
-  filename: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.5)",
-    fontWeight: 500,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    padding: "6px 0 2px",
-    borderTop: "1px solid rgba(255,255,255,0.08)",
+  email: { fontSize: 11, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textShadow: "0 1px 4px rgba(0,0,0,0.5)" },
+  meta: { fontSize: 9, color: "rgba(255,255,255,0.7)", fontWeight: 500, marginTop: 1, textShadow: "0 1px 3px rgba(0,0,0,0.5)" },
+  phoneSideActions: {
+    position: "absolute",
+    right: 8,
+    bottom: 60,
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+    alignItems: "center",
   },
-  cardActions: { display: "flex", gap: 8, padding: "8px 18px 16px" },
-  downloadBtn: {
-    flex: 1,
-    display: "inline-flex",
+  sideBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: "50%",
+    background: "rgba(0,0,0,0.35)",
+    border: "none",
+    display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: 6,
-    padding: "9px 0",
-    borderRadius: 8,
-    background: "rgba(99,102,241,0.25)",
-    color: "#e0e7ff",
-    fontSize: 13,
-    fontWeight: 600,
-    textDecoration: "none",
     cursor: "pointer",
+    backdropFilter: "blur(6px)",
     transition: "all 0.2s",
-    border: "1px solid rgba(99,102,241,0.3)",
-    boxShadow: "0 2px 8px rgba(99,102,241,0.2)",
   },
-  deleteBtn: {
-    flex: 1,
-    display: "inline-flex",
+  phoneHomeBar: {
+    display: "flex",
+    justifyContent: "center",
+    padding: "8px 0 4px",
+  },
+  phoneHomePill: {
+    width: 36,
+    height: 4,
+    borderRadius: 4,
+    background: "rgba(255,255,255,0.2)",
+  },
+  pagination: {
+    display: "flex",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    padding: "9px 0",
-    borderRadius: 8,
-    background: "rgba(239,68,68,0.2)",
-    color: "#fecaca",
+    marginTop: 28,
+    paddingBottom: 8,
+    flexWrap: "wrap",
+  },
+  pageBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    border: "1px solid rgba(255,255,255,0.12)",
+    background: "rgba(255,255,255,0.08)",
+    color: "rgba(255,255,255,0.7)",
     fontSize: 13,
     fontWeight: 600,
-    border: "1px solid rgba(239,68,68,0.25)",
     cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backdropFilter: "blur(8px)",
     transition: "all 0.2s",
   },
 };
