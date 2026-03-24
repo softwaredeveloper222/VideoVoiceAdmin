@@ -978,8 +978,8 @@ const d = {
     flexShrink: 0,
     border: "1.5px solid rgba(255,255,255,0.35)",
   },
-  email: { fontSize: 10, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textShadow: "0 1px 4px rgba(0,0,0,0.6)" },
-  meta: { fontSize: 8, color: "rgba(255,255,255,0.7)", fontWeight: 500, marginTop: 1, textShadow: "0 1px 3px rgba(0,0,0,0.5)" },
+  email: { fontSize: 13, fontWeight: 600, color: "#fff", wordBreak: "break-all", textShadow: "0 1px 4px rgba(0,0,0,0.6)" },
+  meta: { fontSize: 11, color: "rgba(255,255,255,0.7)", fontWeight: 500, marginTop: 2, textShadow: "0 1px 3px rgba(0,0,0,0.5)" },
   phoneSideActions: {
     position: "absolute",
     right: 6,
