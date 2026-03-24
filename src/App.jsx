@@ -230,7 +230,7 @@ function AdminDashboard({ onLogout }) {
   const [search, setSearch] = useState("");
   const [sortOpen, setSortOpen] = useState(false);
   const [page, setPage] = useState(1);
-  const perPage = 6;
+  const perPage = 5;
   const sortRef = useRef(null);
 
   useEffect(() => {
@@ -469,56 +469,64 @@ function AdminDashboard({ onLogout }) {
           <div key={safePage} className="vv-grid" style={d.grid}>
             {paged.map((item, i) => (
               <div key={item.id} style={{ ...d.phone, animation: `cardIn 0.4s ease ${i * 0.06}s both` }}>
-                {/* Phone frame */}
-                <div style={d.phoneFrame}>
-                  {/* Notch */}
-                  <div style={d.phoneNotch}>
-                    <div style={d.phoneCamera} />
-                  </div>
+                <div style={d.iphoneFrame}>
+                  {/* Side buttons */}
+                  <div style={d.iphoneSilent} />
+                  <div style={d.iphoneVolUp} />
+                  <div style={d.iphoneVolDown} />
+                  <div style={d.iphonePower} />
 
-                  {/* Screen */}
-                  <div style={d.phoneScreen}>
-                    {playingId === item.id ? (
-                      <video src={item.video_url} controls autoPlay style={d.video} onEnded={() => setPlayingId(null)} />
-                    ) : (
-                      <VideoThumbnail src={item.video_url} onClick={() => setPlayingId(item.id)} />
-                    )}
+                  {/* Screen area */}
+                  <div style={d.iphoneScreen}>
+                    {/* Dynamic Island */}
+                    <div style={d.dynamicIsland}>
+                      <div style={d.islandCam} />
+                    </div>
 
-                    {/* Overlay info at bottom */}
-                    <div style={d.phoneOverlay}>
-                      <div style={d.phoneUser}>
-                        <div style={d.avatar}>{(item.email?.[0] || "?").toUpperCase()}</div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={d.email}>{item.email}</div>
-                          <div style={d.meta}>{formatDate(item.created_at)}</div>
+                    {/* Video content */}
+                    <div style={d.iphoneContent}>
+                      {playingId === item.id ? (
+                        <video src={item.video_url} controls autoPlay style={d.video} onEnded={() => setPlayingId(null)} />
+                      ) : (
+                        <VideoThumbnail src={item.video_url} onClick={() => setPlayingId(item.id)} />
+                      )}
+
+                      {/* Bottom overlay */}
+                      <div style={d.phoneOverlay}>
+                        <div style={d.phoneUser}>
+                          <div style={d.avatar}>{(item.email?.[0] || "?").toUpperCase()}</div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={d.email}>{item.email}</div>
+                            <div style={d.meta}>{formatDate(item.created_at)}</div>
+                          </div>
                         </div>
+                      </div>
+
+                      {/* Side actions */}
+                      <div style={d.phoneSideActions}>
+                        <button onClick={() => handleDownload(item)} style={d.sideBtn} title="Download">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item)}
+                          disabled={deleting === item.id}
+                          style={{ ...d.sideBtn, opacity: deleting === item.id ? 0.5 : 1 }}
+                          title="Delete"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
 
-                    {/* Side action buttons */}
-                    <div style={d.phoneSideActions}>
-                      <button onClick={() => handleDownload(item)} style={d.sideBtn} title="Download">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                          <polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item)}
-                        disabled={deleting === item.id}
-                        style={{ ...d.sideBtn, opacity: deleting === item.id ? 0.5 : 1 }}
-                        title="Delete"
-                      >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        </svg>
-                      </button>
+                    {/* Home indicator */}
+                    <div style={d.homeBar}>
+                      <div style={d.homePill} />
                     </div>
-                  </div>
-
-                  {/* Home indicator */}
-                  <div style={d.phoneHomeBar}>
-                    <div style={d.phoneHomePill} />
                   </div>
                 </div>
               </div>
@@ -582,7 +590,7 @@ function AdminDashboard({ onLogout }) {
           from { opacity: 0; transform: translateY(20px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .vv-grid { grid-template-columns: repeat(6, 1fr); }
+        .vv-grid { grid-template-columns: repeat(5, 1fr); }
         .vv-mobile-bar { display: none !important; }
         @media (max-width: 1400px) { .vv-grid { grid-template-columns: repeat(4, 1fr); } }
         @media (max-width: 1000px) { .vv-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -824,41 +832,97 @@ const d = {
   },
   grid: {
     display: "grid",
-    gap: 20,
+    gap: 24,
+    padding: "0 4px",
   },
   phone: {
     display: "flex",
     justifyContent: "center",
   },
-  phoneFrame: {
+  iphoneFrame: {
     width: "100%",
-    background: "#1a1a2e",
-    borderRadius: 28,
-    padding: "8px 6px",
-    border: "2px solid rgba(255,255,255,0.12)",
-    boxShadow: "0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
+    aspectRatio: "71/147",
+    position: "relative",
+    background: "#1b1b1f",
+    borderRadius: 32,
+    padding: 3,
+    border: "1px solid #3a3a3c",
+    boxShadow: "0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04), inset 0 0 0 1px rgba(255,255,255,0.05)",
+  },
+  // Side buttons
+  iphoneSilent: {
+    position: "absolute",
+    left: -3,
+    top: 72,
+    width: 3,
+    height: 16,
+    background: "#3a3a3c",
+    borderRadius: "3px 0 0 3px",
+  },
+  iphoneVolUp: {
+    position: "absolute",
+    left: -3,
+    top: 100,
+    width: 3,
+    height: 28,
+    background: "#3a3a3c",
+    borderRadius: "3px 0 0 3px",
+  },
+  iphoneVolDown: {
+    position: "absolute",
+    left: -3,
+    top: 136,
+    width: 3,
+    height: 28,
+    background: "#3a3a3c",
+    borderRadius: "3px 0 0 3px",
+  },
+  iphonePower: {
+    position: "absolute",
+    right: -3,
+    top: 110,
+    width: 3,
+    height: 40,
+    background: "#3a3a3c",
+    borderRadius: "0 3px 3px 0",
+  },
+  iphoneScreen: {
+    borderRadius: 29,
+    overflow: "hidden",
+    background: "#000",
     display: "flex",
     flexDirection: "column",
-    overflow: "hidden",
-  },
-  phoneNotch: {
-    display: "flex",
-    justifyContent: "center",
-    padding: "4px 0 6px",
-  },
-  phoneCamera: {
-    width: 40,
-    height: 5,
-    borderRadius: 10,
-    background: "rgba(255,255,255,0.1)",
-  },
-  phoneScreen: {
-    flex: 1,
-    borderRadius: 20,
-    overflow: "hidden",
     position: "relative",
-    aspectRatio: "9/16",
+    height: "100%",
+  },
+  dynamicIsland: {
+    position: "absolute",
+    top: 8,
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: 62,
+    height: 18,
+    borderRadius: 20,
     background: "#000",
+    zIndex: 10,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    paddingRight: 6,
+    border: "1px solid rgba(255,255,255,0.05)",
+  },
+  islandCam: {
+    width: 7,
+    height: 7,
+    borderRadius: "50%",
+    background: "#1a1a2e",
+    border: "1px solid #2a2a3e",
+    boxShadow: "inset 0 0 2px rgba(99,102,241,0.3)",
+  },
+  iphoneContent: {
+    flex: 1,
+    position: "relative",
+    overflow: "hidden",
   },
   video: { width: "100%", height: "100%", objectFit: "cover" },
   videoPlaceholder: {
@@ -874,25 +938,25 @@ const d = {
     transition: "opacity 0.3s",
   },
   playBtn: {
-    width: 48,
-    height: 48,
+    width: 44,
+    height: 44,
     borderRadius: "50%",
-    background: "rgba(255,255,255,0.2)",
-    border: "2px solid rgba(255,255,255,0.4)",
+    background: "rgba(255,255,255,0.18)",
+    border: "2px solid rgba(255,255,255,0.35)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     transition: "all 0.2s",
     paddingLeft: 3,
-    backdropFilter: "blur(6px)",
+    backdropFilter: "blur(8px)",
   },
   phoneOverlay: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    padding: "32px 12px 14px",
-    background: "linear-gradient(transparent, rgba(0,0,0,0.7))",
+    padding: "40px 10px 20px",
+    background: "linear-gradient(transparent, rgba(0,0,0,0.75))",
     pointerEvents: "none",
   },
   phoneUser: {
@@ -901,33 +965,33 @@ const d = {
     gap: 8,
   },
   avatar: {
-    width: 30,
-    height: 30,
+    width: 26,
+    height: 26,
     borderRadius: "50%",
     background: "linear-gradient(135deg, #818cf8, #6366f1)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 700,
     color: "#fff",
     flexShrink: 0,
-    border: "2px solid rgba(255,255,255,0.3)",
+    border: "1.5px solid rgba(255,255,255,0.35)",
   },
-  email: { fontSize: 11, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textShadow: "0 1px 4px rgba(0,0,0,0.5)" },
-  meta: { fontSize: 9, color: "rgba(255,255,255,0.7)", fontWeight: 500, marginTop: 1, textShadow: "0 1px 3px rgba(0,0,0,0.5)" },
+  email: { fontSize: 10, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textShadow: "0 1px 4px rgba(0,0,0,0.6)" },
+  meta: { fontSize: 8, color: "rgba(255,255,255,0.7)", fontWeight: 500, marginTop: 1, textShadow: "0 1px 3px rgba(0,0,0,0.5)" },
   phoneSideActions: {
     position: "absolute",
-    right: 8,
-    bottom: 60,
+    right: 6,
+    bottom: 80,
     display: "flex",
     flexDirection: "column",
-    gap: 12,
+    gap: 10,
     alignItems: "center",
   },
   sideBtn: {
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
     borderRadius: "50%",
     background: "rgba(0,0,0,0.35)",
     border: "none",
@@ -935,19 +999,24 @@ const d = {
     alignItems: "center",
     justifyContent: "center",
     cursor: "pointer",
-    backdropFilter: "blur(6px)",
+    backdropFilter: "blur(8px)",
     transition: "all 0.2s",
   },
-  phoneHomeBar: {
+  homeBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     display: "flex",
     justifyContent: "center",
-    padding: "8px 0 4px",
+    padding: "6px 0 5px",
+    zIndex: 10,
   },
-  phoneHomePill: {
+  homePill: {
     width: 36,
     height: 4,
     borderRadius: 4,
-    background: "rgba(255,255,255,0.2)",
+    background: "rgba(255,255,255,0.35)",
   },
   pagination: {
     display: "flex",
