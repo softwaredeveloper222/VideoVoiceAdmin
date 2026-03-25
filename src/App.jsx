@@ -85,7 +85,7 @@ function LoginPage({ onLogin }) {
               <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
             </svg>
           </div>
-          <h1 style={login.title}>VideoVoice</h1>
+          <h1 style={login.title}>CISCO AR Experience</h1>
           <p style={login.subtitle}>Admin Panel</p>
         </div>
 
@@ -156,63 +156,63 @@ const login = {
   },
   card: {
     position: "relative",
-    width: 380,
-    padding: "40px 32px 36px",
+    width: 520,
+    padding: "52px 40px 44px",
     background: "rgba(255,255,255,0.12)",
     border: "1px solid rgba(255,255,255,0.18)",
-    borderRadius: 16,
+    borderRadius: 20,
     backdropFilter: "blur(24px)",
     boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
   },
-  logoWrap: { textAlign: "center", marginBottom: 28 },
+  logoWrap: { textAlign: "center", marginBottom: 36 },
   logo: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
+    width: 60,
+    height: 60,
+    borderRadius: 16,
     background: "rgba(255,255,255,0.15)",
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 14,
   },
-  title: { fontSize: 22, fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.02em" },
-  subtitle: { fontSize: 13, color: "rgba(255,255,255,0.75)", marginTop: 4 },
+  title: { fontSize: 26, fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.02em" },
+  subtitle: { fontSize: 15, color: "rgba(255,255,255,0.75)", marginTop: 6 },
   error: {
     background: "rgba(239,68,68,0.2)",
     border: "1px solid rgba(239,68,68,0.4)",
     color: "#fecaca",
-    padding: "10px 14px",
-    borderRadius: 10,
-    fontSize: 13,
+    padding: "12px 16px",
+    borderRadius: 12,
+    fontSize: 14,
     fontWeight: 500,
-    marginBottom: 16,
+    marginBottom: 20,
     textAlign: "center",
   },
-  field: { marginBottom: 18 },
-  label: { display: "block", fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.85)", marginBottom: 6 },
+  field: { marginBottom: 22 },
+  label: { display: "block", fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.85)", marginBottom: 8 },
   input: {
     width: "100%",
-    padding: "11px 14px",
-    borderRadius: 10,
+    padding: "14px 16px",
+    borderRadius: 12,
     border: "1px solid rgba(255,255,255,0.25)",
     background: "rgba(255,255,255,0.12)",
     color: "#fff",
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: 500,
     outline: "none",
     transition: "border-color 0.2s",
   },
   btn: {
     width: "100%",
-    padding: "13px 0",
-    borderRadius: 10,
+    padding: "15px 0",
+    borderRadius: 12,
     border: "none",
     background: "linear-gradient(135deg, #818cf8, #6366f1)",
     color: "#fff",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: 700,
     cursor: "pointer",
-    marginTop: 6,
+    marginTop: 10,
     letterSpacing: "0.02em",
     boxShadow: "0 4px 16px rgba(99,102,241,0.4)",
     transition: "opacity 0.2s",
@@ -336,7 +336,7 @@ function AdminDashboard({ onLogout }) {
               <polygon points="23 7 16 12 23 17 23 7" />
               <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
             </svg>
-            <span style={d.sidebarBrand}>VideoVoice</span>
+            <span style={d.sidebarBrand}>CISCO AR Experience</span>
           </div>
           <nav style={d.nav}>
             <div style={d.navItem}>
@@ -365,7 +365,7 @@ function AdminDashboard({ onLogout }) {
             <polygon points="23 7 16 12 23 17 23 7" />
             <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
           </svg>
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>VideoVoice</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>CISCO AR Experience</span>
         </div>
         <button onClick={onLogout} style={d.mobileLogout}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
