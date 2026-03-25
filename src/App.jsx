@@ -327,7 +327,7 @@ function AdminDashboard({ onLogout }) {
   };
 
   return (
-    <div style={d.app}>
+    <div className="vv-app" style={d.app}>
       {/* Sidebar */}
       <aside className="vv-sidebar" style={d.sidebar}>
         <div style={d.sidebarTop}>
@@ -578,6 +578,8 @@ function AdminDashboard({ onLogout }) {
         button:hover, a:hover { filter: brightness(1.15); }
         input:focus { border-color: rgba(99,102,241,0.5) !important; }
         input::placeholder { color: rgba(255,255,255,0.4); }
+        .vv-main::-webkit-scrollbar { display: none; }
+        .vv-main { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes dropIn {
           from { opacity: 0; transform: translateY(-8px) scale(0.96); }
           to { opacity: 1; transform: translateY(0) scale(1); }
@@ -598,7 +600,8 @@ function AdminDashboard({ onLogout }) {
           .vv-grid { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; }
           .vv-sidebar { display: none !important; }
           .vv-mobile-bar { display: flex !important; }
-          .vv-main { padding: 16px !important; }
+          .vv-main { padding: 16px !important; height: auto !important; overflow: visible !important; }
+          .vv-app { height: auto !important; overflow: auto !important; }
           .vv-login-card { width: 100% !important; max-width: 340px; padding: 28px 20px 24px !important; }
         }
       `}</style>
@@ -610,7 +613,8 @@ const d = {
   app: {
     display: "flex",
     flexWrap: "wrap",
-    minHeight: "100vh",
+    height: "100vh",
+    overflow: "hidden",
     backgroundImage: "url(/img/Blue-AR-space@2x.png)",
     backgroundSize: "100% 100%",
     backgroundAttachment: "fixed",
@@ -692,9 +696,11 @@ const d = {
   },
   main: {
     flex: 1,
-    padding: "28px 32px 48px",
+    padding: "28px 32px 0px",
     minWidth: 0,
     animation: "fadeUp 0.4s ease",
+    overflowY: "auto",
+    height: "100vh",
   },
   header: {
     display: "flex",
