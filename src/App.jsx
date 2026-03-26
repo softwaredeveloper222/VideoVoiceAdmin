@@ -330,7 +330,7 @@ function AdminDashboard({ onLogout }) {
         <div style={d.sidebarTop}>
           <div style={d.sidebarLogo}>
             <img src="/img/CISCO.png" alt="CISCO" style={{ height: 42, objectFit: "contain" }} />
-            <span style={d.sidebarBrand}>CISCO AR Experience</span>
+            {/* <span style={d.sidebarBrand}>CISCO AR Experience</span> */}
           </div>
           <nav style={d.nav}>
             <div style={d.navItem}>
@@ -626,8 +626,7 @@ const d = {
   sidebarTop: {},
   sidebarLogo: {
     display: "flex",
-    alignItems: "center",
-    gap: 10,
+    justifyContent: "center",
     padding: "4px 8px 24px",
   },
   sidebarBrand: { fontSize: 16, fontWeight: 700, color: "#fff", letterSpacing: "-0.02em", textShadow: "0 1px 4px rgba(0,0,0,0.3)" },
