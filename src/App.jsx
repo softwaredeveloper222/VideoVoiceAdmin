@@ -80,10 +80,7 @@ function LoginPage({ onLogin }) {
       >
         <div style={login.logoWrap}>
           <div style={login.logo}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="23 7 16 12 23 17 23 7" />
-              <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-            </svg>
+            <img src="/img/CISCO@2x.png" alt="CISCO" style={{ height: 42, objectFit: "contain" }} />
           </div>
           <h1 style={login.title}>CISCO AR Experience</h1>
           <p style={login.subtitle}>Admin Panel</p>
@@ -166,10 +163,10 @@ const login = {
   },
   logoWrap: { textAlign: "center", marginBottom: 36 },
   logo: {
-    width: 60,
-    height: 60,
+    width: 150,
+    height: 80,
     borderRadius: 16,
-    background: "rgba(255,255,255,0.15)",
+    background: "rgba(252, 252, 252, 0.15)",
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
@@ -332,10 +329,7 @@ function AdminDashboard({ onLogout }) {
       <aside className="vv-sidebar" style={d.sidebar}>
         <div style={d.sidebarTop}>
           <div style={d.sidebarLogo}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="23 7 16 12 23 17 23 7" />
-              <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-            </svg>
+            <img src="/img/CISCO.png" alt="CISCO" style={{ height: 42, objectFit: "contain" }} />
             <span style={d.sidebarBrand}>CISCO AR Experience</span>
           </div>
           <nav style={d.nav}>
@@ -361,10 +355,7 @@ function AdminDashboard({ onLogout }) {
       {/* Mobile top bar */}
       <div className="vv-mobile-bar" style={d.mobileBar}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="23 7 16 12 23 17 23 7" />
-            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-          </svg>
+          <img src="/img/CISCO.png" alt="CISCO" style={{ height: 42, objectFit: "contain" }} />
           <span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>CISCO AR Experience</span>
         </div>
         <button onClick={onLogout} style={d.mobileLogout}>
