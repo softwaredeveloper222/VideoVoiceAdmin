@@ -474,29 +474,27 @@ function AdminDashboard({ onLogout }) {
                       <div style={d.islandCam} />
                     </div>
 
-                    {/* Video content */}
-                    <div style={d.iphoneContent}>
+                    {/* Video area */}
+                    <div style={d.iphoneVideoArea}>
                       {playingId === item.id ? (
                         <video src={item.video_url} controls autoPlay style={d.video} onEnded={() => setPlayingId(null)} />
                       ) : (
                         <VideoThumbnail src={item.video_url} onClick={() => setPlayingId(item.id)} />
                       )}
+                    </div>
 
-                      {/* Bottom overlay */}
-                      <div style={d.phoneOverlay}>
-                        <div style={d.phoneUser}>
-                          <div style={d.avatar}>{(item.email?.[0] || "?").toUpperCase()}</div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={d.email}>{item.email}</div>
-                            <div style={d.meta}>{formatDate(item.created_at)}</div>
-                          </div>
+                    {/* Bottom panel */}
+                    <div style={d.phoneBottomPanel}>
+                      <div style={d.phonePanelInfo}>
+                        <div style={d.avatar}>{(item.email?.[0] || "?").toUpperCase()}</div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={d.email}>{item.email}</div>
+                          <div style={d.meta}>{formatDate(item.created_at)}</div>
                         </div>
                       </div>
-
-                      {/* Side actions */}
-                      <div style={d.phoneSideActions}>
-                        <button onClick={() => handleDownload(item)} style={d.sideBtn} title="Download">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <div style={d.phonePanelActions}>
+                        <button onClick={() => handleDownload(item)} style={d.panelBtn} title="Download">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                             <polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
                           </svg>
@@ -504,10 +502,10 @@ function AdminDashboard({ onLogout }) {
                         <button
                           onClick={() => handleDelete(item)}
                           disabled={deleting === item.id}
-                          style={{ ...d.sideBtn, opacity: deleting === item.id ? 0.5 : 1 }}
+                          style={{ ...d.panelBtn, opacity: deleting === item.id ? 0.5 : 1 }}
                           title="Delete"
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                           </svg>
                         </button>
@@ -837,7 +835,7 @@ const d = {
   },
   iphoneFrame: {
     width: "100%",
-    aspectRatio: "71/147",
+    aspectRatio: "71/135",
     position: "relative",
     background: "#1b1b1f",
     borderRadius: 32,
@@ -915,10 +913,12 @@ const d = {
     border: "1px solid #2a2a3e",
     boxShadow: "inset 0 0 2px rgba(99,102,241,0.3)",
   },
-  iphoneContent: {
+  iphoneVideoArea: {
     flex: 1,
+    minHeight: 0,
     position: "relative",
     overflow: "hidden",
+    background: "#000",
   },
   video: { width: "100%", height: "100%", objectFit: "cover" },
   videoPlaceholder: {
@@ -946,23 +946,30 @@ const d = {
     paddingLeft: 3,
     backdropFilter: "blur(8px)",
   },
-  phoneOverlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: "40px 10px 20px",
-    background: "linear-gradient(transparent, rgba(0,0,0,0.75))",
-    pointerEvents: "none",
+  phoneBottomPanel: {
+    flexShrink: 0,
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    padding: "12px 14px",
+    background: "#07182D",
+    borderTop: "1px solid rgba(255,255,255,0.08)",
   },
-  phoneUser: {
+  phonePanelInfo: {
+    flex: 1,
+    minWidth: 0,
     display: "flex",
     alignItems: "center",
     gap: 8,
   },
+  phonePanelActions: {
+    display: "flex",
+    gap: 6,
+    flexShrink: 0,
+  },
   avatar: {
-    width: 26,
-    height: 26,
+    width: 32,
+    height: 32,
     borderRadius: "50%",
     background: "linear-gradient(135deg, #818cf8, #6366f1)",
     display: "flex",
@@ -974,39 +981,27 @@ const d = {
     flexShrink: 0,
     border: "1.5px solid rgba(255,255,255,0.35)",
   },
-  email: { fontSize: 13, fontWeight: 600, color: "#fff", wordBreak: "break-all", textShadow: "0 1px 4px rgba(0,0,0,0.6)" },
-  meta: { fontSize: 11, color: "rgba(255,255,255,0.7)", fontWeight: 500, marginTop: 2, textShadow: "0 1px 3px rgba(0,0,0,0.5)" },
-  phoneSideActions: {
-    position: "absolute",
-    right: 6,
-    bottom: 80,
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-    alignItems: "center",
-  },
-  sideBtn: {
+  email: { fontSize: 13, fontWeight: 600, color: "#fff", wordBreak: "break-all", lineHeight: 2.05 },
+  meta: { fontSize: 11, color: "rgba(255,255,255,0.55)", fontWeight: 500, marginTop: 2 },
+  panelBtn: {
     width: 32,
     height: 32,
-    borderRadius: "50%",
-    background: "rgba(0,0,0,0.35)",
-    border: "none",
+    borderRadius: 8,
+    background: "rgba(255,255,255,0.1)",
+    border: "1px solid rgba(255,255,255,0.12)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     cursor: "pointer",
-    backdropFilter: "blur(8px)",
     transition: "all 0.2s",
+    flexShrink: 0,
   },
   homeBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
+    flexShrink: 0,
     display: "flex",
     justifyContent: "center",
-    padding: "6px 0 5px",
-    zIndex: 10,
+    padding: "6px 0 6px",
+    background: "#07182D",
   },
   homePill: {
     width: 36,
